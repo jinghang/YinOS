@@ -1,0 +1,4 @@
+/test/*.log
+/test/bx_enh_dbg.ini
+/src/boot/boot.bin
+/src/boot/boot.lst
