@@ -1,5 +1,5 @@
 org 0x7c00
-
+[bits 16]
 start:
 ;清屏
 call clean_screen
@@ -13,6 +13,11 @@ mov di,0
 mov si,msg
 ;显示字符串
 call show_msg
+;读 loader 到 0x7e00
+call loader
+;跳到 loader
+jmp 0x7e0:0
+
 hlt;CPU暂停
 
 ;清屏
@@ -36,6 +41,19 @@ mov [es:di],al
 add di,2
 inc si
 loop show_msg
+ret
+
+loader:
+mov ax,0x7e0
+mov es,ax
+mov bx,0    ;es:bx 指向接受从扇区读入数据的内存区
+mov dl,80h  ;驱动器号
+mov dh,0    ;磁头号
+mov ch,0    ;磁道号
+mov cl,2    ;扇区号
+mov al,1    ;(al)=要读取的扇区数
+mov ah,02H  ;功能号，表示读
+int 13h
 ret
 
 times 510-($-$$) db 0
