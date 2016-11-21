@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gkd>
+	<vmType>qemu</vmType>
+	<vm>qemu-system-x86_64</vm>
+	<vmArguments>-fda c.img -s -S -vnc :9 -chardev socket,id=qmp,host=0.0.0.0,port=4444,server,nowait -mon chardev=qmp,mode=control</vmArguments> 
+	<gkd_server_port>1234</gkd_server_port>
+	<hd>c.img</hd>
+	<stopCommand>killall -9 qemu-system-x86_64</stopCommand>
+	<vncPort>9</vncPort>
+	<loadBreakpoint>true</loadBreakpoint>
+	<qmpHost>localhost</qmpHost>
+	<qmpPort>4444</qmpPort>
+	<ndisasm>/opt/local/bin/ndisasm</ndisasm>
+</gkd>
