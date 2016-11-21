@@ -2,5 +2,7 @@
 /test/bx_enh_dbg.ini
 /src/boot/*.bin
 /src/boot/*.lst
+test/*.bin
+test/*.lst
 *~
 jmpDB.mv.db
