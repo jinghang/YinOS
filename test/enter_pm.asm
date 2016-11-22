@@ -35,7 +35,7 @@ jmp $
 
 
 ProtectModeEntry:
-mov ax,0x11
+mov eax,0x11
 jmp $
 
 times 510-($-$$) db 0
