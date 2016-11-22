@@ -1,7 +1,5 @@
 org 0x7e00
 
-[bits 16]
-
 jmp start
 
 ;全局描述符表，表的每一行都是8个字节
@@ -9,17 +7,21 @@ gdt:
 GDT_HOLD:db 0x00, 0x00, 0x00, 0x00, 0x00, 00000000b, 00000000b, 0x00 ; 占位
 GDT_CODE:db 0xff, 0xff, 0x00, 0x00, 0x00, 10011010b, 11001111b, 0x00 ; 0~4GB 代码段
 GDT_DATA:db 0xff, 0xff, 0x00, 0x00, 0x00, 10010010b, 11001111b, 0x00 ; 0~4BG 数据段
+GDT_VIDEO:db 0xff, 0xff, 0x00, 0x80, 0x0b, 10010010b, 11001111b, 0x00 ; 0~4BG 数据段
 GdtLen equ $-gdt
 gdtr:
     dw GdtLen-1 ; 描述符表中有3行数据，所以 8*3-1=23
     dd gdt; 描述符表的首地址
-
+;段选择子
 SelectorLDT equ GDT_CODE - gdt
+SelectorVideo equ GDT_VIDEO - gdt
 
 msg:
 db "Loading......"
 MsgLen equ $-msg
 
+[section .s16]
+[bits 16]
 show_msg:
 mov al,[si]
 mov [es:di],al
@@ -58,9 +60,15 @@ jmp dword SelectorLDT:ProtectModeEntry
 
 jmp $
 
-
+[section .s32]
+[bits 32]
 ProtectModeEntry:
-mov eax,0x11
+mov ax,SelectorVideo
+mov gs,ax
+mov edi,0
+mov ah,0CH
+mov al,'K'
+mov [gs:edi],ax
 jmp $
 
 hlt;CPU暂停
