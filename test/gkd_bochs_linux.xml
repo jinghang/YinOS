@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gkd>
+	<vmType>bochs</vmType>
+	<vm>/usr/local/bin/bochs</vm>
+	<vmArguments>-f bochsrc_linux.txt -q</vmArguments>
+	<vncPort>5900</vncPort>
+	<ndisasm>/opt/local/bin/ndisasm</ndisasm>
+	<loadBreakpoint>true</loadBreakpoint>
+</gkd>
+
