@@ -8,12 +8,13 @@ GDT_HOLD:db 0x00, 0x00, 0x00, 0x00, 0x00, 00000000b, 00000000b, 0x00 ; 占位
 GDT_CODE:db 0xff, 0xff, 0x00, 0x00, 0x00, 10011010b, 11001111b, 0x00 ; 0~4GB 代码段
 GDT_DATA:db 0xff, 0xff, 0x00, 0x00, 0x00, 10010010b, 11001111b, 0x00 ; 0~4BG 数据段
 GDT_VIDEO:db 0xff, 0xff, 0x00, 0x80, 0x0b, 10010010b, 11001111b, 0x00 ; 0~4BG 数据段
-GdtLen equ $-gdt
+GdtLen equ $-gdt    ;描述符表长度
 gdtr:
     dw GdtLen-1 ; 描述符表中有3行数据，所以 8*3-1=23
     dd gdt; 描述符表的首地址
 ;段选择子
-SelectorLDT equ GDT_CODE - gdt
+SelectorCode equ GDT_CODE - gdt
+SelectorData equ GDT_DATA - gdt
 SelectorVideo equ GDT_VIDEO - gdt
 
 msg:
@@ -56,19 +57,26 @@ or eax,1
 mov cr0,eax
 
 ;真正进入保护模式
-jmp dword SelectorLDT:ProtectModeEntry
+jmp dword SelectorCode:ProtectModeEntry
 
 jmp $
 
+;32位保护模式代码
 [section .s32]
 [bits 32]
 ProtectModeEntry:
+mov ax,SelectorData
+mov ds,ax
 mov ax,SelectorVideo
 mov gs,ax
 mov edi,0
 mov ah,0CH
 mov al,'K'
 mov [gs:edi],ax
+
+;读内核到内存中
+
+
 jmp $
 
 hlt;CPU暂停
