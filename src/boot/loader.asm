@@ -81,6 +81,49 @@ mov esp,0x100400
 ;读内核到内存中
 ;https://0cch.com/minikernel/2013/08/26/e4-bd-bf-e7-94-a8pci-ide-controller-e8-af-bb-e5-86-99-e7-a1-ac-e7-9b-98-1.html
 
+mov edi,0x100500;es:edi 存放数据的目的地址
+
+mov dx,0x01f1   ;将状态清清0
+mov al,0
+out dx,al
+
+mov dx,0x01f2   ;读取扇区数的端口号
+mov al,0x01     ;读取1个扇区
+out dx,al
+
+mov dx,0x01f3   ;LBA起始扇区号 0~7 位 端口号
+mov al,0x02     ;读第三个扇区，从0开始编码
+out dx,al
+
+inc dx          ;0x01f4
+mov al,0x00
+out dx,al       ; 8~15 位
+
+inc dx          ;0x01f5
+mov al,0x00
+out dx,al       ; 16~23 位
+
+inc dx          ;0x01f6
+mov al,0xe0     ;LBA模式，主硬盘，以及LBA扇区号 24~27 位
+out dx,al
+
+mov dx,0x01f7
+mov al,0x20     ;读命令
+out dx,al
+
+;等待硬盘就绪
+.waits:
+    in al,dx
+    test al,8
+    jz .waits
+
+;下面开始读数据到指定地址
+mov cx,512/2
+mov dx,0x01f0   ;数据端口
+rep insw
+
+jmp 0x100500
+
 jmp $
 
 hlt;CPU暂停
