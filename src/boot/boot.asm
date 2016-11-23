@@ -43,17 +43,52 @@ inc si
 loop show_msg
 ret
 
+;通过LBA读取硬盘
 loader:
 mov ax,0x7e0
-mov es,ax
-mov bx,0    ;es:bx 指向接受从扇区读入数据的内存区
-mov dl,80h  ;驱动器号
-mov dh,0    ;磁头号
-mov ch,0    ;磁道号
-mov cl,2    ;扇区号
-mov al,1    ;(al)=要读取的扇区数
-mov ah,02H  ;功能号，表示读
-int 13h
+mov ds,ax
+mov bx,0        ; ds:bx 存放数据的目的地址
+
+mov dx,0x01f2   ;读取扇区数的端口号
+mov al,0x01     ;读取1个扇区
+out dx,al
+
+mov dx,0x01f3   ;LBA起始扇区号 0~7 位 端口号
+mov al,0x01     ;读第二个扇区，从0开始编码
+out dx,al
+
+inc dx          ;0x01f4
+mov al,0x00
+out dx,al       ; 8~15 位
+
+inc dx          ;0x01f5
+mov al,0x00
+out dx,al       ; 16~23 位
+
+inc dx          ;0x01f6
+mov al,0xe0     ;LBA模式，主硬盘，以及LBA扇区号 24~27 位
+out dx,al
+
+mov dx,0x01f7
+mov al,0x20     ;读命令
+out dx,al
+
+;等待硬盘就绪
+.waits:
+    in al,dx
+    and al,0x88
+    cmp al,0x08
+    jnz .waits
+
+;下面开始读数据到指定地址
+mov cx,256
+mov dx,0x01f0   ;数据端口
+.readw:
+    in ax,dx
+    mov [bx],ax
+    add bx,2
+    loop .readw
+
 ret
 
 times 510-($-$$) db 0
