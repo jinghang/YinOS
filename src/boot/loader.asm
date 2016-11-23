@@ -79,7 +79,7 @@ mov esp,0x100400
 ;mov [gs:edi],ax
 
 ;读内核到内存中
-
+;https://0cch.com/minikernel/2013/08/26/e4-bd-bf-e7-94-a8pci-ide-controller-e8-af-bb-e5-86-99-e7-a1-ac-e7-9b-98-1.html
 
 jmp $
 
