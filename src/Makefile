@@ -20,6 +20,7 @@ kernel.bin: kernel.o init.o
 disk: boot.bin loader.bin kernel.bin
 	dd if=boot/boot.bin of=../test/c.img bs=512 count=1 conv=notrunc
 	dd if=boot/loader.bin of=../test/c.img bs=512 count=1 conv=notrunc seek=1
+	dd if=kernel/kernel.bin of=../test/c.img bs=512 count=1 conv=notrunc seek=2
 
 clean:
 	rm -f boot/*.lst boot/*.bin kernel/*.o kernel/*.bin
