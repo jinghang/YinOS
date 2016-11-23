@@ -46,8 +46,12 @@ ret
 ;通过LBA读取硬盘
 loader:
 mov ax,0x7e0
-mov ds,ax
-mov bx,0        ; ds:bx 存放数据的目的地址
+mov es,ax
+mov di,0        ; es:di 存放数据的目的地址
+
+mov dx,0x01f1   ;将状态清清0
+mov al,0
+out dx,al
 
 mov dx,0x01f2   ;读取扇区数的端口号
 mov al,0x01     ;读取1个扇区
@@ -76,18 +80,13 @@ out dx,al
 ;等待硬盘就绪
 .waits:
     in al,dx
-    and al,0x88
-    cmp al,0x08
-    jnz .waits
+    test al,8
+    jz .waits
 
 ;下面开始读数据到指定地址
-mov cx,256
+mov cx,512/2
 mov dx,0x01f0   ;数据端口
-.readw:
-    in ax,dx
-    mov [bx],ax
-    add bx,2
-    loop .readw
+rep insw
 
 ret
 
