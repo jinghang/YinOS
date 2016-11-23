@@ -67,12 +67,16 @@ jmp $
 ProtectModeEntry:
 mov ax,SelectorData
 mov ds,ax
+mov es,ax
+mov fs,ax
+mov ss,ax
 mov ax,SelectorVideo
 mov gs,ax
-mov edi,0
-mov ah,0CH
-mov al,'K'
-mov [gs:edi],ax
+mov esp,0x100400
+;mov edi,0
+;mov ah,0CH
+;mov al,'K'
+;mov [gs:edi],ax
 
 ;读内核到内存中
 
