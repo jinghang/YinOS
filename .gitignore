@@ -7,3 +7,5 @@ test/*.lst
 *~
 jmpDB.mv.db
 gkd.xml
+src/kernel/*.bin
+src/kernel/*.o
