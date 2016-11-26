@@ -7,13 +7,12 @@
   <currentLanguage>en_US</currentLanguage>
   <fontsize>12</fontsize>
   <fontFamily>Dialog</fontFamily>
-  <x>124</x>
-  <y>126</y>
-  <width>1087</width>
-  <height>814</height>
-  <divX>514</divX>
-  <divY>260</divY>
-  <jmpSplitPanel__divY>0</jmpSplitPanel__divY>
+  <x>49</x>
+  <y>24</y>
+  <width>1311</width>
+  <height>744</height>
+  <divX>642</divX>
+  <divY>313</divY>
   <osDebugSplitPane__DividerLocation>150</osDebugSplitPane__DividerLocation>
   <profileMemoryFromAddress/>
   <profileMemoryToAddress/>
@@ -26,7 +25,7 @@
   <idt/>
   <ldt/>
   <logToPetersoftServer>false</logToPetersoftServer>
-  <loadBreakpointAtStartup>false</loadBreakpointAtStartup>
+  <loadBreakpointAtStartup>true</loadBreakpointAtStartup>
   <updateAfterGKDCommand>false</updateAfterGKDCommand>
   <updateAfterGKDCommand__register>false</updateAfterGKDCommand__register>
   <updateAfterGKDCommand__memory>false</updateAfterGKDCommand__memory>
