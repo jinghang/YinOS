@@ -2,6 +2,7 @@
 extern init
 
 global write_mem8
+global start
 
 start:
 mov edi,0

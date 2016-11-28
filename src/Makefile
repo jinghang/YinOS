@@ -14,7 +14,7 @@ init.o: kernel/init.c
 	gcc $(CFLAGS) -Os -c -fno-builtin -m32 -o kernel/init.o kernel/init.c
 
 kernel.bin: kernel.o init.o
-	ld --oformat binary -N -e start -Ttext 0x100500  -o kernel/kernel.bin kernel/kernel.o kernel/init.o
+	ld --oformat binary -N -e start -Ttext 0x100500 -m elf_i386 -o kernel/kernel.bin kernel/kernel.o kernel/init.o
 	
 
 disk: boot.bin loader.bin kernel.bin
