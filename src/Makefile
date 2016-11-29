@@ -1,26 +1,47 @@
-CFLAGS = -Wall -pedantic -W -nostdlib -nostdinc -Wno-long-long -fomit-frame-pointer
+#Makefile
+
+ENTRYPOINT = 0x100500
+
+ASMBFLAGS = -I boot/include/
+ASMKFLAGS = -I include/ -f elf
+
+CFLAGS = -I include/ -c -g -fno-builtin -m32
+LDFLAGS =  -e start -Ttext $(ENTRYPOINT) -m elf_i386
+
+ASM = nasm
+DASM = ndisasm
+
+CC = gcc
+LD = ld
+
+OSBOOT = bin/boot.bin bin/loader.bin
+OSKERNEL = bin/kernel.bin
+OBJS = bin/obj/kernel.o bin/obj/init.o
+
+
 all:disk
 
-boot.bin: boot/boot.asm
-	nasm boot/boot.asm -o boot/boot.bin -l boot/boot.lst
+bin/boot.bin: boot/boot.asm
+	$(ASM) $(ASMBFLAGS) -o $@ $<
 
-loader.bin: boot/loader.asm
-	nasm boot/loader.asm -o boot/loader.bin -l boot/loader.lst
+bin/loader.bin: boot/loader.asm
+	$(ASM) $(ASMBFLAGS) -o $@ $<
 
-kernel.o: kernel/kernel.asm
-	nasm -f elf -o kernel/kernel.o kernel/kernel.asm
+bin/obj/kernel.o: kernel/kernel.asm
+	$(ASM) $(ASMKFLAGS) -o $@ $<
 
-init.o: kernel/init.c
-	gcc $(CFLAGS) -Os -c -fno-builtin -m32 -o kernel/init.o kernel/init.c
+bin/obj/init.o: kernel/init.c
+	$(CC) $(CFLAGS) -o $@ $<
 
-kernel.bin: kernel.o init.o
-	ld --oformat binary -N -e start -Ttext 0x100500 -m elf_i386 -o kernel/kernel.bin kernel/kernel.o kernel/init.o
+$(OSKERNEL) : $(OBJS)
+	$(LD) $(LDFLAGS) -o $(OSKERNEL) $(OBJS)
+	
 	
 
-disk: boot.bin loader.bin kernel.bin
-	dd if=boot/boot.bin of=../test/c.img bs=512 count=1 conv=notrunc
-	dd if=boot/loader.bin of=../test/c.img bs=512 count=1 conv=notrunc seek=1
-	dd if=kernel/kernel.bin of=../test/c.img bs=512 count=1 conv=notrunc seek=2
+disk: $(OSBOOT) $(OSKERNEL)
+	dd if=bin/boot.bin of=../test/c.img bs=512 count=1 conv=notrunc
+	dd if=bin/loader.bin of=../test/c.img bs=512 count=1 conv=notrunc seek=1
+	dd if=bin/kernel.bin of=../test/c.img bs=512 count=1 conv=notrunc seek=2
 
 clean:
-	rm -f boot/*.lst boot/*.bin kernel/*.o kernel/*.bin
+	rm -f bin/*.lst bin/*.bin bin/obj/*.o
