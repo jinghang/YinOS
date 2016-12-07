@@ -9,3 +9,5 @@ jmpDB.mv.db
 gkd.xml
 src/kernel/*.bin
 src/kernel/*.o
+bochsout.txt
+src/bin

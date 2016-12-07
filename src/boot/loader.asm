@@ -65,12 +65,13 @@ jmp $
 [section .s32]
 [bits 32]
 ProtectModeEntry:
-mov ax,SelectorData
-mov ds,ax
+mov eax,SelectorCode
 mov es,ax
-mov fs,ax
 mov ss,ax
-mov ax,SelectorVideo
+mov eax,SelectorData
+mov ds,ax
+mov fs,ax
+mov eax,SelectorVideo
 mov gs,ax
 mov esp,0x100400
 ;mov edi,0

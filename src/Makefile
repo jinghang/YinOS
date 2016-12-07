@@ -22,10 +22,10 @@ OBJS = bin/obj/kernel.o bin/obj/init.o
 all:disk
 
 bin/boot.bin: boot/boot.asm
-	$(ASM) $(ASMBFLAGS) -o $@ $<
+	$(ASM) $(ASMBFLAGS) -l bin/boot.lst -o $@  $<
 
 bin/loader.bin: boot/loader.asm
-	$(ASM) $(ASMBFLAGS) -o $@ $<
+	$(ASM) $(ASMBFLAGS) -l bin/loader.lst -o $@ $<
 
 bin/obj/kernel.o: kernel/kernel.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
