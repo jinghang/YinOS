@@ -67,10 +67,10 @@ jmp $
 ProtectModeEntry:
 mov eax,SelectorCode
 mov es,ax
-mov ss,ax
 mov eax,SelectorData
 mov ds,ax
 mov fs,ax
+mov ss,ax
 mov eax,SelectorVideo
 mov gs,ax
 mov esp,0x100400
@@ -119,9 +119,9 @@ out dx,al
     jz .waits
 
 ;下面开始读数据到指定地址
-mov cx,512/2
+mov ecx,512/4
 mov dx,0x01f0   ;数据端口
-rep insw
+rep insd
 
 jmp 0x100500
 
