@@ -2,11 +2,11 @@
 
 ENTRYPOINT = 0x100500
 
-ASMBFLAGS = -I boot/include/
-ASMKFLAGS = -I include/ -f elf
+ASMBFLAGS = 
+ASMKFLAGS = -f elf
 
-CFLAGS = -I include/ -c -g -fno-builtin -m32
-LDFLAGS =  -e start -Ttext $(ENTRYPOINT) -m elf_i386
+CFLAGS =  -c -m32
+LDFLAGS = -e start -Ttext $(ENTRYPOINT) -m elf_i386 
 
 ASM = nasm
 DASM = ndisasm
@@ -22,10 +22,10 @@ OBJS = bin/obj/kernel.o bin/obj/init.o
 all:disk
 
 bin/boot.bin: boot/boot.asm
-	$(ASM) $(ASMBFLAGS) -l bin/boot.lst -o $@  $<
+	$(ASM) $(ASMBFLAGS) -o $@  $<
 
 bin/loader.bin: boot/loader.asm
-	$(ASM) $(ASMBFLAGS) -l bin/loader.lst -o $@ $<
+	$(ASM) $(ASMBFLAGS) -o $@ $<
 
 bin/obj/kernel.o: kernel/kernel.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
@@ -41,7 +41,7 @@ $(OSKERNEL) : $(OBJS)
 disk: $(OSBOOT) $(OSKERNEL)
 	dd if=bin/boot.bin of=../test/c.img bs=512 count=1 conv=notrunc
 	dd if=bin/loader.bin of=../test/c.img bs=512 count=1 conv=notrunc seek=1
-	dd if=bin/kernel.bin of=../test/c.img bs=512 count=1 conv=notrunc seek=2
+	dd if=bin/kernel.bin of=../test/c.img bs=512 count=20 conv=notrunc seek=2
 
 clean:
 	rm -f bin/*.lst bin/*.bin bin/obj/*.o

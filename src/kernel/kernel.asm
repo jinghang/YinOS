@@ -4,6 +4,7 @@ extern init
 global write_mem8
 global start
 
+[section .text]
 start:
 mov edi,0
 mov ah,0CH

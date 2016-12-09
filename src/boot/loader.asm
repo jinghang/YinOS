@@ -4,17 +4,17 @@ jmp start
 
 ;全局描述符表，表的每一行都是8个字节
 gdt:
-GDT_HOLD:db 0x00, 0x00, 0x00, 0x00, 0x00, 00000000b, 00000000b, 0x00 ; 占位
-GDT_CODE:db 0xff, 0xff, 0x00, 0x00, 0x00, 10011010b, 11001111b, 0x00 ; 0~4GB 代码段
-GDT_DATA:db 0xff, 0xff, 0x00, 0x00, 0x00, 10010010b, 11001111b, 0x00 ; 0~4BG 数据段
+GDT_HOLD: db 0x00, 0x00, 0x00, 0x00, 0x00, 00000000b, 00000000b, 0x00 ; 占位
+GDT_CODE: db 0xff, 0xff, 0x00, 0x00, 0x00, 10011010b, 11001111b, 0x00 ; 0~4GB 代码段
+GDT_DATA: db 0xff, 0xff, 0x00, 0x00, 0x00, 10010010b, 11001111b, 0x00 ; 0~4BG 数据段
 GDT_VIDEO:db 0xff, 0xff, 0x00, 0x80, 0x0b, 10010010b, 11001111b, 0x00 ; 0~4BG 显示段
 GdtLen equ $-gdt    ;描述符表长度
 gdtr:
     dw GdtLen-1 ; 描述符表中有3行数据，所以 8*3-1=23
     dd gdt; 描述符表的首地址
 ;段选择子
-SelectorCode equ GDT_CODE - gdt
-SelectorData equ GDT_DATA - gdt
+SelectorCode  equ GDT_CODE  - gdt
+SelectorData  equ GDT_DATA  - gdt
 SelectorVideo equ GDT_VIDEO - gdt
 
 msg:
@@ -65,31 +65,24 @@ jmp $
 [section .s32]
 [bits 32]
 ProtectModeEntry:
-mov eax,SelectorCode
-mov es,ax
 mov eax,SelectorData
+mov es,ax
 mov ds,ax
 mov fs,ax
 mov ss,ax
 mov eax,SelectorVideo
 mov gs,ax
-mov esp,0x100400
-;mov edi,0
-;mov ah,0CH
-;mov al,'K'
-;mov [gs:edi],ax
+mov esp,0x100400    ;设置堆栈
 
 ;读内核到内存中
-;https://0cch.com/minikernel/2013/08/26/e4-bd-bf-e7-94-a8pci-ide-controller-e8-af-bb-e5-86-99-e7-a1-ac-e7-9b-98-1.html
-
-mov edi,0x100500;es:edi 存放数据的目的地址
+; https://0cch.com/minikernel/2013/08/26/e4-bd-bf-e7-94-a8pci-ide-controller-e8-af-bb-e5-86-99-e7-a1-ac-e7-9b-98-1.html
 
 mov dx,0x01f1   ;将状态清清0
 mov al,0
 out dx,al
 
 mov dx,0x01f2   ;读取扇区数的端口号
-mov al,0x01     ;读取1个扇区
+mov al,20     ;读取20个扇区
 out dx,al
 
 mov dx,0x01f3   ;LBA起始扇区号 0~7 位 端口号
@@ -119,13 +112,14 @@ out dx,al
     jz .waits
 
 ;下面开始读数据到指定地址
-mov ecx,512/4
+mov edi,0x100500;es:edi 存放数据的目的地址
+mov ecx,512/2
 mov dx,0x01f0   ;数据端口
-rep insd
+rep insw        ;从端口复制到目的地址
 
-jmp 0x100500
+jmp 0x100500    ;跳到内核
 
-jmp $
+nop
 
 hlt;CPU暂停
 
