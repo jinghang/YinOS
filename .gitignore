@@ -5,6 +5,7 @@
 test/*.bin
 test/*.lst
 *~
+test/peter-bochs.xml
 jmpDB.mv.db
 gkd.xml
 src/kernel/*.bin

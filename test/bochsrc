@@ -5,8 +5,8 @@ megs: 32
 #cpu
 #cpu: count=1, ips=100000000
 #clock: sync=slowddown
-cpu: ips=150000000
-clock: sync=both
+#cpu: ips=150000000
+#clock: sync=both
 
 
 # filename of ROM images
@@ -25,6 +25,9 @@ ata0-master: type=disk, path="c.img"
 
 # choose the boot disk
 boot: c
+
+#display_library: wx
+# other choices: win32 sdl wx carbon amigaos beos macintosh nogui rfb term
 
 # where do we send log message?
 log: bochsout.txt

@@ -1,2 +1,2 @@
 #/bin/bash
-bochs -f bochsrc_linux.txt -q
+bochs -f bochsrc -q

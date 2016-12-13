@@ -17,6 +17,16 @@ SelectorCode  equ GDT_CODE  - gdt
 SelectorData  equ GDT_DATA  - gdt
 SelectorVideo equ GDT_VIDEO - gdt
 
+;////////////////////////////////////////////////////////////////////////////
+; 一些常量
+;///////////////////////////////////////////////////////////////////////////
+TopOfStack              equ 0x7000
+BaseOfLoaderPhyAddr     equ 0x7e00
+BaseOfKernelFilePyhAddr equ 0x10000
+KernelEntryPhyAddr      equ 0x100500
+
+
+;/////////////////////////////////////////////////////////////////////////
 msg:
 db "Loading......"
 MsgLen equ $-msg
@@ -62,8 +72,9 @@ jmp dword SelectorCode:ProtectModeEntry
 jmp $
 
 ;32位保护模式代码
-[section .s32]
-[bits 32]
+[SECTION .s32]
+ALIGN 32
+[BITS 32]
 ProtectModeEntry:
 mov eax,SelectorData
 mov es,ax
@@ -72,7 +83,7 @@ mov fs,ax
 mov ss,ax
 mov eax,SelectorVideo
 mov gs,ax
-mov esp,0x100400    ;设置堆栈
+mov esp,TopOfStack    ;设置堆栈
 
 ;读内核到内存中
 ; https://0cch.com/minikernel/2013/08/26/e4-bd-bf-e7-94-a8pci-ide-controller-e8-af-bb-e5-86-99-e7-a1-ac-e7-9b-98-1.html
@@ -112,15 +123,90 @@ out dx,al
     jz .waits
 
 ;下面开始读数据到指定地址
-mov edi,0x100500;es:edi 存放数据的目的地址
-mov ecx,512/2
+mov edi,BaseOfKernelFilePyhAddr;es:edi 存放数据的目的地址
+mov ecx,512*20/2
 mov dx,0x01f0   ;数据端口
 rep insw        ;从端口复制到目的地址
 
-jmp 0x100500    ;跳到内核
+call move_kernel
+
+jmp SelectorCode:KernelEntryPhyAddr    ;跳到内核
+
 
 nop
 
 hlt;CPU暂停
+
+;--------------------------------------------------------
+; 根据elf数据复制内核到指定地址
+;--------------------------------------------------------
+move_kernel:
+    xor esi,esi;esi清零清零
+    mov cx,word [BaseOfKernelFilePyhAddr+0x2c]  ; program header 的数量数量
+    movzx ecx,cx
+    mov esi,[BaseOfKernelFilePyhAddr+0x1c]      ; program header 的偏移偏移
+    add esi,BaseOfKernelFilePyhAddr             ; program header 的物理地址地址
+
+    .Begin:
+    mov eax,[esi+0]
+    cmp eax,0
+    jz .NoAction
+
+    ;开始调用 void* memcpy(void * dest, const void * src, int size);
+    push dword [esi+0x10]   ;要复制的长度长度 p_filesz
+    mov eax,[esi+0x04]      ;要复制的源地址偏移偏移
+    add eax,BaseOfKernelFilePyhAddr
+    push eax                ;要复制的源地址
+    push dword [esi+0x08]   ;要复制到的目的地址
+    call memcpy
+    add esp,12              ;还原堆栈，三个参数 4X3=12
+
+    .NoAction:
+    add esi,0x20    ; 每个 program header 长32个字节，esi指向下一个 program header 
+    dec ecx
+    jnz .Begin
+
+    ret
+
+;-----结束结束--------------------------------------------
+
+;----------------------------------------------------------
+; //内存拷贝函数
+; void* memcpy(void * dest, const void * src, int size);
+;----------------------------------------------------------
+memcpy:
+    push    ebp
+    mov ebp,esp ;保存栈顶,然后用用epb来读参数
+
+    push esi    ;保存寄存器数据
+    push edi
+    push ecx
+
+    mov edi,[ebp+ 8] ;dest，因为有有 push ebp 所以加8
+    mov esi,[ebp+12] ;src
+    mov ecx,[ebp+16] ;size
+
+    rep movsb   ;开始传送
+
+    mov eax,[ebp+8];返回目的地址
+
+    ;还原寄存器
+    pop ecx
+    pop edi
+    pop esi
+    mov esp,ebp
+    pop ebp
+
+    ;函数返回返回
+    ret
+;----------------------
+; // memcpy 结束
+;-------------------------------------------------------
+
+;//////////////////////////////////////////////////////////////////////
+[SECTION .data1]
+ALIGN 32
+LABEL_DATA:
+
 
 
