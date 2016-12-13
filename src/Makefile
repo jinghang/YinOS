@@ -5,8 +5,9 @@ ENTRYPOINT = 0x100500
 ASMBFLAGS = 
 ASMKFLAGS = -f elf
 
-CFLAGS =  -c -m32
-LDFLAGS = -e start -Ttext $(ENTRYPOINT) -m elf_i386 
+#CFLAGS =  -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include
+CFLAGS =  -c -Wall -m32 -nostdinc -fno-builtin -fno-stack-protector -I include
+LDFLAGS = -e start -Ttext $(ENTRYPOINT) -m elf_i386 -nostdlib
 
 ASM = nasm
 DASM = ndisasm
